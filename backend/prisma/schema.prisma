@@ -1,0 +1,80 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String
+  role         String        @default("seeker") // "seeker" or "employer"
+  bio          String?
+  location     String?
+  skills       String        @default("[]") // stored as JSON string
+  resume       String?
+  companyName         String?
+  companyDescription  String?
+  companyWebsite      String?
+  savedJobs    String        @default("[]") // stored as JSON String of Job IDs
+  
+  postedJobs   Job[]         @relation("EmployerJobs")
+  applications Application[] @relation("UserApplications")
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Job {
+  id               String        @id @default(uuid())
+  title            String
+  description      String
+  company          String
+  location         String
+  locationType     String        @default("onsite")
+  type             String        @default("full-time")
+  category         String
+  experience       String        @default("any")
+  salaryMin        Int?
+  salaryMax        Int?
+  salaryCurrency   String        @default("USD")
+  salaryPeriod     String        @default("yearly")
+  requirements     String        @default("[]") // JSON string
+  skills           String        @default("[]") // JSON string
+  status           String        @default("open")
+  views            Int           @default(0)
+  deadline         DateTime?
+  
+  employerId       String
+  employer         User          @relation("EmployerJobs", fields: [employerId], references: [id])
+  
+  applications     Application[] @relation("JobApplications")
+  applicationsCount Int          @default(0)
+
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Application {
+  id           String   @id @default(uuid())
+  jobId        String
+  job          Job      @relation("JobApplications", fields: [jobId], references: [id], onDelete: Cascade)
+  applicantId  String
+  applicant    User     @relation("UserApplications", fields: [applicantId], references: [id], onDelete: Cascade)
+  
+  resume       String?
+  coverLetter  String
+  status       String   @default("pending") // pending, reviewed, shortlisted, rejected, hired
+  employerNote String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([jobId, applicantId])
+}
