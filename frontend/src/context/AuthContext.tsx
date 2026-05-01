@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem('jp_token');
         setToken(null);
         setUser(null);
-        toast.success('Logged out successfully');
+        toast.success('Logged out successfully', { duration: 2000 });
     };
 
     const updateUser = (data: Partial<User>) => {
