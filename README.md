@@ -60,33 +60,34 @@
 - Smart search with 400ms debounce — by title, keyword, or company
 - Advanced filters — job type, location type, category, experience level
 - Apply to jobs with a cover letter and resume link per application
-- Real-time application tracker — pending, reviewed, shortlisted, hired, rejected
-- Optimistic bookmark — save jobs instantly with no loading delay, reverts silently on error
-- Profile management — skill tags, bio, location, resume URL
-- Forgot password — secure email token reset with 1-hour expiry
+- Animated application timeline — Applied → Reviewed → Shortlisted → Hired with live gradient progress bar
+- Application filter tabs — All / Active / Shortlisted / Closed, click summary cards to filter instantly
+- Optimistic bookmark — save jobs instantly, reverts silently if the request fails
+- Location autocomplete on profile — 44 Indian cities, keyboard navigable, closes on outside click
+- Forgot password — SHA-256 token reset with 1-hour expiry, email or dev-mode link
 
 ### For Employers
 - Post jobs with salary range (INR), requirements, skills, and deadline
-- Per-job analytics — applicants count, view count, top-performing listing
+- Employer dashboard analytics — applicants per job bar chart, views per job chart
+- Top job highlight card — surfaces the listing generating the most interest
 - Application management — view applicants, update status with employer notes
-- Dashboard analytics — applicants per job bar chart, views per job, star listing highlight
-- Company profile — name, description, website
 
 ### Admin Panel
-- Platform-wide stats — users, seekers, employers, jobs, applications, new this week
-- 7-day jobs-posted bar chart (pure CSS, no charting library)
+- Platform-wide KPI cards — users, seekers, employers, jobs, applications, new this week
+- 7-day jobs-posted bar chart (pure CSS animated, no external charting library)
 - Application status funnel with animated progress bars
 - Most active companies leaderboard
+- Jobs table with merged Job/Company cell and type badge, plus "Posted By" employer column
 - Full user and job management with deletion
 
 ### General
-- Dark / Light mode toggle with system preference support
+- Dark / Light mode toggle
 - Fully responsive — mobile-first layout
-- Framer Motion animations and micro-interactions throughout
-- Lazy loading — pages load only when navigated to
-- Skeleton loaders — shimmer cards while data fetches
-- Infinite scroll — LinkedIn-style continuous job loading
-- Rich empty states — illustrated with CTA buttons
+- Framer Motion animations throughout
+- Lazy loading — every non-critical page loads on demand via React.lazy()
+- Skeleton loaders — shimmer cards while data fetches, never a blank screen
+- Infinite scroll — LinkedIn-style continuous loading via IntersectionObserver
+- Rich empty states with illustrated SVG and CTA buttons
 
 ---
 

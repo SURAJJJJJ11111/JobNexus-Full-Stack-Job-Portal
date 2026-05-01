@@ -21,7 +21,6 @@ const CITY_SUGGESTIONS = [
     'Imphal, Manipur', 'Shillong, Meghalaya', 'Aizawl, Mizoram', 'Panaji, Goa',
     'Remote, India', 'Bangalore (Remote)', 'Mumbai (Hybrid)', 'Delhi (Hybrid)',
 ];
-import toast from 'react-hot-toast';
 
 const ROLE_META: Record<string, { label: string; badge: string; icon: JSX.Element }> = {
     seeker:   { label: 'Job Seeker',  badge: 'badge-blue',   icon: <Briefcase size={14} /> },
