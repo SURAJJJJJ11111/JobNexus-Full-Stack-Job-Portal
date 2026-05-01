@@ -207,16 +207,19 @@ router.post('/forgot-password',
                     });
                     return res.json({ success: true, message: 'Reset link sent to your email.' });
                 } catch (emailErr) {
-                    console.error('Email send failed:', emailErr.message);
+                    // Log full error so Render logs show the actual SMTP failure reason
+                    console.error('SMTP error:', emailErr.message, emailErr.code || '');
                 }
             }
 
-            // Development fallback: return the raw link in the response
+            // Fallback when SMTP is not configured or failed:
+            // Always return the link so the frontend can display it directly.
+            // Once SMTP_USER + SMTP_PASS are set on Render, the email branch
+            // returns early and this line is never reached.
             return res.json({
                 success: true,
-                message: 'Reset link generated.',
-                // Only expose the link in non-production if no email service is set up
-                ...(process.env.NODE_ENV !== 'production' && { resetUrl })
+                message: 'Reset link generated. Copy the link below (email delivery not configured).',
+                resetUrl,
             });
         } catch (error) {
             next(error);

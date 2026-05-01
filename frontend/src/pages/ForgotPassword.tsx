@@ -95,22 +95,22 @@ export default function ForgotPassword() {
                                     If <strong style={{ color: 'var(--text-primary)' }}>{email}</strong> is registered, a password reset link has been sent. It expires in <strong style={{ color: 'var(--text-primary)' }}>1 hour</strong>.
                                 </p>
 
-                                {/* Dev mode helper — shows reset link when no email service is configured */}
                                 {devResetUrl && (
                                     <div style={{
                                         marginTop: '1.25rem', padding: '1rem',
-                                        background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)',
+                                        background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.2)',
                                         borderRadius: 'var(--radius-md)', textAlign: 'left',
                                     }}>
-                                        <p style={{ fontSize: '0.75rem', color: 'var(--warning)', fontWeight: 700, marginBottom: '0.5rem' }}>
-                                            ⚠️ Dev Mode — No email service configured
+                                        <p style={{ fontSize: '0.75rem', color: 'var(--brand-400)', fontWeight: 700, marginBottom: '0.5rem' }}>
+                                            Reset Link (email delivery not available)
                                         </p>
-                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
-                                            Use this link to reset the password:
+                                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.625rem' }}>
+                                            Click the link below to reset your password:
                                         </p>
                                         <a href={devResetUrl} style={{
-                                            fontSize: '0.75rem', color: 'var(--brand-400)',
+                                            fontSize: '0.78rem', color: 'var(--brand-400)',
                                             wordBreak: 'break-all', display: 'block',
+                                            textDecoration: 'underline',
                                         }}>
                                             {devResetUrl}
                                         </a>
