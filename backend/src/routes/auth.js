@@ -189,7 +189,8 @@ router.post('/forgot-password',
                     const nodemailer = require('nodemailer');
                     const transporter = nodemailer.createTransport({
                         service: 'gmail',
-                        auth: { user: emailUser, pass: emailPass }
+                        auth: { user: emailUser, pass: emailPass },
+                        connectionTimeout: 5000, // Fail fast if SMTP is blocked
                     });
                     await transporter.sendMail({
                         from: `"JobNexus" <${emailUser}>`,
