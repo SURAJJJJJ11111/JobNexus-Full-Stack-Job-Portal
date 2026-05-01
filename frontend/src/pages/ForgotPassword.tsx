@@ -102,10 +102,11 @@ export default function ForgotPassword() {
                                         borderRadius: 'var(--radius-md)', textAlign: 'left',
                                     }}>
                                         <p style={{ fontSize: '0.75rem', color: 'var(--brand-400)', fontWeight: 700, marginBottom: '0.5rem' }}>
-                                            Reset Link (email delivery not available)
+                                            ✨ Portfolio Demo Mode
                                         </p>
                                         <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.625rem' }}>
-                                            Click the link below to reset your password:
+                                            (Email delivery is restricted to verified addresses on the free tier.)
+                                            <br />Click the link below to safely test the password reset flow:
                                         </p>
                                         <a href={devResetUrl} style={{
                                             fontSize: '0.78rem', color: 'var(--brand-400)',
