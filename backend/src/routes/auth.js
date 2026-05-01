@@ -180,16 +180,19 @@ router.post('/forgot-password',
 
             const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${rawToken}`;
 
-            // Try to send email if SMTP is configured
-            if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+            // Try to send email if SMTP/EMAIL is configured
+            const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
+            const emailPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
+
+            if (emailUser && emailPass) {
                 try {
                     const nodemailer = require('nodemailer');
                     const transporter = nodemailer.createTransport({
                         service: 'gmail',
-                        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+                        auth: { user: emailUser, pass: emailPass }
                     });
                     await transporter.sendMail({
-                        from: `"JobNexus" <${process.env.SMTP_USER}>`,
+                        from: `"JobNexus" <${emailUser}>`,
                         to: email,
                         subject: 'Reset your JobNexus password',
                         html: `
