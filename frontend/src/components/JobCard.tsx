@@ -1,6 +1,10 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Clock, Briefcase, IndianRupee, Bookmark } from 'lucide-react';
+import { MapPin, Clock, IndianRupee, Bookmark } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { saveJob } from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import toast from 'react-hot-toast';
 
 interface Job {
     _id: string;
@@ -45,15 +49,53 @@ function formatSalary(salary?: { min: number; max: number; currency: string }) {
     return `₹${fmt(salary.min)} – ${fmt(salary.max)}`;
 }
 
-export default function JobCard({ job, index = 0 }: { job: Job; index?: number }) {
+export default function JobCard({ job, index = 0, initialSaved = false }: { job: Job; index?: number; initialSaved?: boolean }) {
+    const { isAuthenticated, user } = useAuth();
     const initials = job.company?.substring(0, 2).toUpperCase() || 'JP';
     const salaryStr = formatSalary(job.salary);
+
+    // Check if job is already in user's saved list (passed from parent or context)
+    const alreadySaved = initialSaved || (
+        Array.isArray((user as any)?.savedJobs)
+            ? (user as any).savedJobs.some((sj: any) => (sj.id || sj._id || sj) === job._id)
+            : false
+    );
+
+    // ── Optimistic UI: update bookmark instantly, revert on error ─────────
+    const [saved, setSaved] = useState(alreadySaved);
+    const [saving, setSaving] = useState(false);
+
+    const handleSave = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!isAuthenticated) {
+            toast.error('Sign in to save jobs');
+            return;
+        }
+
+        // Optimistic update — flip state immediately
+        const prevSaved = saved;
+        setSaved(!saved);
+
+        try {
+            setSaving(true);
+            await saveJob(job._id);
+            toast.success(prevSaved ? 'Job removed from saved' : 'Job saved! ✓', { duration: 2000 });
+        } catch {
+            // Revert on failure
+            setSaved(prevSaved);
+            toast.error('Could not save job. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.4 }}
+            transition={{ delay: Math.min(index * 0.04, 0.4), duration: 0.4 }}
         >
             <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', display: 'block' }}>
                 <div className="job-card">
@@ -66,17 +108,29 @@ export default function JobCard({ job, index = 0 }: { job: Job; index?: number }
                                 <div className="job-card__title">{job.title}</div>
                             </div>
                         </div>
-                        <button
+
+                        {/* Bookmark button with optimistic animation */}
+                        <motion.button
                             className="btn btn-icon btn-ghost btn-sm"
-                            title="Save job"
-                            onClick={(e) => e.preventDefault()}
-                            style={{ color: 'var(--text-muted)', flexShrink: 0 }}
+                            title={saved ? 'Remove from saved' : 'Save job'}
+                            onClick={handleSave}
+                            disabled={saving}
+                            animate={{ scale: saving ? 0.85 : 1 }}
+                            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                            style={{
+                                color: saved ? 'var(--brand-400)' : 'var(--text-muted)',
+                                flexShrink: 0,
+                            }}
                         >
-                            <Bookmark size={16} />
-                        </button>
+                            <Bookmark
+                                size={16}
+                                fill={saved ? 'var(--brand-400)' : 'none'}
+                                style={{ transition: 'fill 0.2s, color 0.2s' }}
+                            />
+                        </motion.button>
                     </div>
 
-                    {/* Meta */}
+                    {/* Meta badges */}
                     <div className="job-card__meta">
                         <span className={`badge ${typeColorMap[job.type] || 'badge-gray'}`}>{job.type}</span>
                         <span className="badge badge-gray">

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Search, MapPin, ArrowRight, Zap, Monitor, Palette, Megaphone, DollarSign, HeartPulse, GraduationCap, Building2, TrendingUp } from 'lucide-react';
 import { getJobs } from '../services/api';
 import JobCard from '../components/JobCard';
+import { JobCardSkeletonGrid } from '../components/JobCardSkeleton';
 
 const categories = [
     { icon: <Monitor size={32} />, label: 'Technology', color: 'rgba(59,130,246,0.1)' },
@@ -19,9 +20,13 @@ export default function Home() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchLocation, setSearchLocation] = useState('');
     const [featuredJobs, setFeaturedJobs] = useState<any[]>([]);
+    const [loadingJobs, setLoadingJobs] = useState(true);
 
     useEffect(() => {
-        getJobs({ limit: 6 }).then(({ data }) => setFeaturedJobs(data.jobs || [])).catch(() => { });
+        getJobs({ limit: 6 })
+            .then(({ data }) => setFeaturedJobs(data.jobs || []))
+            .catch(() => {})
+            .finally(() => setLoadingJobs(false));
     }, []);
 
     const handleSearch = (e: React.FormEvent) => {
@@ -133,7 +138,7 @@ export default function Home() {
             </section>
 
             {/* Featured Jobs */}
-            {featuredJobs.length > 0 && (
+            {(loadingJobs || featuredJobs.length > 0) && (
                 <section className="section">
                     <div className="container">
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -145,9 +150,13 @@ export default function Home() {
                                 View All Jobs <ArrowRight size={15} />
                             </Link>
                         </div>
-                        <div className="jobs-grid">
-                            {featuredJobs.map((job, i) => <JobCard key={job._id} job={job} index={i} />)}
-                        </div>
+                        {loadingJobs ? (
+                            <JobCardSkeletonGrid count={6} />
+                        ) : (
+                            <div className="jobs-grid">
+                                {featuredJobs.map((job, i) => <JobCard key={job._id} job={job} index={i} />)}
+                            </div>
+                        )}
                     </div>
                 </section>
             )}
