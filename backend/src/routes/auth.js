@@ -180,7 +180,40 @@ router.post('/forgot-password',
 
             const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${rawToken}`;
 
-            // Try to send email if SMTP/EMAIL is configured
+            // 1. Try to send email via Resend API (HTTP-based, bypasses Render SMTP block)
+            if (process.env.RESEND_API_KEY) {
+                try {
+                    const { Resend } = require('resend');
+                    const resend = new Resend(process.env.RESEND_API_KEY);
+                    const { error } = await resend.emails.send({
+                        from: 'JobNexus <onboarding@resend.dev>', // Resend's default free-tier sender
+                        to: email,
+                        subject: 'Reset your JobNexus password',
+                        html: `
+                            <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;">
+                                <h2 style="color:#2563eb;">Reset Your Password</h2>
+                                <p>Hi ${user.name},</p>
+                                <p>You requested a password reset for your JobNexus account. Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
+                                <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:12px 28px;border-radius:50px;text-decoration:none;font-weight:600;margin:16px 0;">
+                                    Reset Password
+                                </a>
+                                <p style="color:#64748b;font-size:0.85em;">If you didn't request this, you can safely ignore this email.</p>
+                                <p style="color:#64748b;font-size:0.75em;">Or paste this link: ${resetUrl}</p>
+                            </div>
+                        `
+                    });
+
+                    if (error) {
+                        console.error('Resend API error:', error);
+                    } else {
+                        return res.json({ success: true, message: 'Reset link sent via Resend API.' });
+                    }
+                } catch (resendErr) {
+                    console.error('Resend SDK error:', resendErr.message);
+                }
+            }
+
+            // 2. Fallback: Try to send email via SMTP (will hang/fail on Render Free tier)
             const emailUser = process.env.SMTP_USER || process.env.EMAIL_USER;
             const emailPass = process.env.SMTP_PASS || process.env.EMAIL_PASS;
 
@@ -216,7 +249,7 @@ router.post('/forgot-password',
                 }
             }
 
-            // Fallback when SMTP is not configured or failed:
+            // 3. Fallback when SMTP/Resend is not configured or failed:
             // Always return the link so the frontend can display it directly.
             // Once SMTP_USER + SMTP_PASS are set on Render, the email branch
             // returns early and this line is never reached.
