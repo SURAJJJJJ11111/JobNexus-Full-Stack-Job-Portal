@@ -3,22 +3,22 @@ import { Briefcase, Github, Linkedin, Twitter } from 'lucide-react';
 
 const FOOTER_LINKS = {
     'For Job Seekers': [
-        { label: 'Browse Jobs',    to: '/jobs' },
-        { label: 'Create Profile', to: '/profile' },
-        { label: 'Saved Jobs',     to: '/dashboard' },
-        { label: 'Apply Now',      to: '/jobs' },
+        { label: 'Browse Jobs',       to: '/jobs' },
+        { label: 'Create Profile',    to: '/profile' },
+        { label: 'Saved Jobs',        to: '/dashboard' },
+        { label: 'My Applications',   to: '/applications' },
     ],
     'For Employers': [
-        { label: 'Post a Job',     to: '/post-job' },
-        { label: 'Browse Talent',  to: '/jobs' },
-        { label: 'My Dashboard',   to: '/dashboard' },
-        { label: 'Sign Up Free',   to: '/register' },
+        { label: 'Post a Job',        to: '/post-job' },
+        { label: 'My Dashboard',      to: '/dashboard' },
+        { label: 'Manage Listings',   to: '/dashboard' },
+        { label: 'Sign Up Free',      to: '/register' },
     ],
-    'Company': [
-        { label: 'About JobNexus', to: '/' },
-        { label: 'Browse All Jobs',to: '/jobs' },
-        { label: 'Login',          to: '/login' },
-        { label: 'Register',       to: '/register' },
+    'Resources': [
+        { label: 'Home',              to: '/' },
+        { label: 'All Jobs',          to: '/jobs' },
+        { label: 'Login',             to: '/login' },
+        { label: 'Register',          to: '/register' },
     ],
 };
 

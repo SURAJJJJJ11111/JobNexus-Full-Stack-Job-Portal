@@ -20,6 +20,7 @@
 ## Table of Contents
 
 - [Live Demo](#live-demo)
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Performance Optimizations](#performance-optimizations)
 - [Tech Stack](#tech-stack)
@@ -42,6 +43,14 @@
 | Database | Supabase PostgreSQL (Production) |
 
 > The Render free tier spins down after inactivity — the first request may take up to 30 seconds to wake up.
+
+---
+
+## Screenshots
+
+| Homepage | Jobs Listing | Login |
+|---|---|---|
+| ![Homepage](frontend/public/screenshots/homepage.png) | ![Jobs](frontend/public/screenshots/jobs.png) | ![Login](frontend/public/screenshots/login.png) |
 
 ---
 

@@ -308,8 +308,8 @@ export default function AdminDashboard() {
                                     <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse', minWidth: 600 }}>
                                         <thead>
                                             <tr style={{ color: 'var(--text-muted)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                                                <th style={{ paddingBottom: '0.875rem' }}>Job Title</th>
-                                                <th style={{ paddingBottom: '0.875rem' }}>Company</th>
+                                                <th style={{ paddingBottom: '0.875rem' }}>Job / Company</th>
+                                                <th style={{ paddingBottom: '0.875rem' }}>Posted By</th>
                                                 <th style={{ paddingBottom: '0.875rem', textAlign: 'center' }}>Apps</th>
                                                 <th style={{ paddingBottom: '0.875rem', textAlign: 'center' }}>Views</th>
                                                 <th style={{ paddingBottom: '0.875rem' }}>Status</th>
@@ -321,8 +321,17 @@ export default function AdminDashboard() {
                                             {jobs.map((j, i) => (
                                                 <motion.tr key={j._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
                                                     style={{ borderTop: '1px solid var(--border-subtle)' }}>
-                                                    <td style={{ padding: '0.875rem 0', fontWeight: 600, maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{j.title}</td>
-                                                    <td style={{ padding: '0.875rem 0', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{j.company}</td>
+                                                    <td style={{ padding: '0.875rem 0.5rem 0.875rem 0' }}>
+                                                        <div style={{ fontWeight: 700, fontSize: '0.875rem', marginBottom: 3 }}>{j.title}</div>
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{j.company}</span>
+                                                            <span className={`badge badge-${j.type === 'full-time' ? 'blue' : 'gray'}`} style={{ fontSize: '0.65rem', padding: '1px 6px' }}>{j.type}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td style={{ padding: '0.875rem 0', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                                                        <div>{j.employer?.name || '—'}</div>
+                                                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', opacity: 0.7 }}>{j.employer?.email}</div>
+                                                    </td>
                                                     <td style={{ padding: '0.875rem 0', textAlign: 'center', fontWeight: 700, color: 'var(--brand-400)' }}>{j.applicationsCount || 0}</td>
                                                     <td style={{ padding: '0.875rem 0', textAlign: 'center', color: 'var(--text-muted)' }}>{j.views || 0}</td>
                                                     <td style={{ padding: '0.875rem 0' }}>
