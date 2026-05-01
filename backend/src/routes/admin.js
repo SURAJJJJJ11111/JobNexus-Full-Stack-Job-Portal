@@ -48,7 +48,7 @@ router.get('/stats', async (req, res, next) => {
 
         // Most active companies (by job count)
         const allJobs = await prisma.job.findMany({ select: { company: true, applicationsCount: true } });
-        const companyMap: Record<string, { jobs: number; applications: number }> = {};
+        const companyMap = {};
         allJobs.forEach(j => {
             if (!companyMap[j.company]) companyMap[j.company] = { jobs: 0, applications: 0 };
             companyMap[j.company].jobs += 1;
