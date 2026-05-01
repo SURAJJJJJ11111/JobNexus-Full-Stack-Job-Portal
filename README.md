@@ -1,382 +1,368 @@
 <div align="center">
 
-# 🚀 JobNexus — Full-Stack Job Portal
+# JobNexus
 
-**A modern, production-quality job portal connecting job seekers with top employers**
+### A full-stack job portal built for modern hiring — fast, clean, and production-ready.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel)](https://job-nexus-full-stack-job-portal.vercel.app/)
-[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://jobnexus-full-stack-job-portal.onrender.com/api/health)
-
-![Tech Stack](https://img.shields.io/badge/Frontend-React%2018%20%2B%20TypeScript-61dafb?style=flat-square&logo=react)
-![Backend](https://img.shields.io/badge/Backend-Node.js%20%2B%20Express-339933?style=flat-square&logo=nodedotjs)
-![Database](https://img.shields.io/badge/Database-PostgreSQL%20%2B%20Prisma-4169E1?style=flat-square&logo=postgresql)
-![Auth](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens)
-![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+[![Live Demo](https://img.shields.io/badge/Live-job--nexus--full--stack--job--portal.vercel.app-0070f3?style=flat-square)](https://job-nexus-full-stack-job-portal.vercel.app/)
+[![Backend](https://img.shields.io/badge/API-jobnexus--full--stack--job--portal.onrender.com-46E3B7?style=flat-square)](https://jobnexus-full-stack-job-portal.onrender.com/api/health)
+[![Stack](https://img.shields.io/badge/Stack-React%20%2B%20Node.js%20%2B%20PostgreSQL-informational?style=flat-square)](https://github.com/SURAJJJJJ11111/JobNexus-Full-Stack-Job-Portal)
+[![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)](LICENSE)
 
 </div>
 
 ---
 
-## 📋 Table of Contents
-
-- [Live Demo](#-live-demo)
-- [Features](#-features)
-- [Performance Optimizations](#-performance-optimizations)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [API Reference](#-api-reference)
-- [Authentication & Password Reset](#-authentication--password-reset)
-- [Environment Variables](#-environment-variables)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
+JobNexus is a production-deployed job portal that handles the complete hiring workflow — from job seeker registration through employer posting, applicant tracking, and admin oversight. It is not a CRUD demo. It is built with the same patterns you would use in a real product: role-based auth, paginated search, optimistic UI, code splitting, and a proper deployment pipeline across Vercel, Render, and Supabase.
 
 ---
 
-## 🌐 Live Demo
+## Table of Contents
 
-| Service | URL |
-|---|---|
-| **Frontend (Vercel)** | https://job-nexus-full-stack-job-portal.vercel.app/ |
-| **Backend API (Render)** | https://jobnexus-full-stack-job-portal.onrender.com/api/health |
-| **Database** | Supabase PostgreSQL (Production) |
-
-> ⚠️ The Render free tier spins down after inactivity — first request may take ~30s to wake up.
-
----
-
-## ✨ Features
-
-### 👨‍💻 For Job Seekers
-- 🔍 **Smart Search** — debounced search by title, keyword, or company (400ms delay)
-- 🎛️ **Advanced Filters** — filter by job type, location type, category & experience level
-- 📝 **Apply to Jobs** — submit cover letter + resume link per application
-- 📊 **Application Tracker** — real-time status: pending → reviewed → shortlisted → hired/rejected
-- 🔖 **Save Jobs** — optimistic bookmark with instant UI feedback, no loading delay
-- 👤 **Profile Management** — skill tags, bio, location, and resume URL
-- 🔐 **Forgot Password** — secure email token reset with 1-hour expiry
-
-### 🏢 For Employers
-- 📋 **Post Jobs** — rich listing with salary range (INR), requirements, skills, deadline
-- 👥 **Manage Applications** — view applicants, update status with notes
-- 📈 **Dashboard Analytics** — job views, applicant counts per listing
-- 🏢 **Company Profile** — company name, description, and website
-
-### ⚙️ Admin Panel
-- 👤 **User Management** — view and delete users
-- 📌 **Job Management** — moderate all job listings
-- 📊 **Platform Stats** — total users, jobs, applications at a glance
-
-### 🎨 General
-- 🌙 **Dark / Light Mode** toggle
-- 📱 **Fully Responsive** — mobile-first design
-- ⚡ **Framer Motion** animations throughout
-- 🏎️ **Lazy Loading** — pages load only when needed (code-splitting)
-- 💀 **Skeleton Loaders** — shimmer cards while data loads (no blank screens)
-- ♾️ **Infinite Scroll** — LinkedIn-style continuous job loading
-- 🎯 **Rich Empty States** — illustrated empty states with CTA buttons
+- [Live Deployment](#live-deployment)
+- [What It Does](#what-it-does)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+- [Environment Variables](#environment-variables)
+- [Deployment](#deployment)
+- [Performance](#performance)
+- [Project Structure](#project-structure)
 
 ---
 
-## 🚀 Performance Optimizations
+## Live Deployment
 
-| Optimization | Implementation | Benefit |
+| Service | URL | Platform |
 |---|---|---|
-| **Skeleton Loaders** | `JobCardSkeleton.tsx` + CSS shimmer | Perceived faster load, no blank screens |
-| **Debounced Search** | `useDebounce` hook (400ms) | 80%+ fewer API calls while typing |
-| **Lazy Loading** | `React.lazy()` + `Suspense` | ~40% smaller initial JS bundle |
-| **Infinite Scroll** | `IntersectionObserver` API | No pagination clicks, LinkedIn-feel |
-| **Optimistic UI** | Save job updates instantly, reverts on error | Instant perceived response |
-| **Code Splitting** | Vite automatic per-route chunks | Faster first contentful paint |
+| Frontend | https://job-nexus-full-stack-job-portal.vercel.app | Vercel |
+| Backend API | https://jobnexus-full-stack-job-portal.onrender.com/api | Render |
+| Database | Supabase PostgreSQL (ap-southeast-1) | Supabase |
+
+> The Render free tier suspends instances after inactivity. The first request after a sleep period may take up to 30 seconds.
 
 ---
 
-## 🛠️ Tech Stack
+## What It Does
 
-### Frontend
-| Technology | Purpose |
-|---|---|
-| **React 18 + TypeScript** | UI framework |
-| **Vite** | Build tool & dev server |
-| **React Router v6** | Client-side routing |
-| **Framer Motion** | Animations & transitions |
-| **Axios** | HTTP client |
-| **Lucide React** | Icon library |
-| **React Hot Toast** | Toast notifications |
-| **CSS Variables** | Design system / theming |
+**For job seekers**
 
-### Backend
-| Technology | Purpose |
-|---|---|
-| **Node.js + Express 5** | REST API server |
-| **Prisma ORM** | Database access layer |
-| **PostgreSQL (Supabase)** | Production database |
-| **JWT (jsonwebtoken)** | Authentication tokens |
-| **bcryptjs** | Password hashing |
-| **express-validator** | Request validation |
-| **Nodemailer** | Password reset emails (optional) |
-| **CORS** | Cross-origin request handling |
+Register, build a profile with skill tags and resume link, browse and filter hundreds of listings, apply with a cover letter, and track every application through its full lifecycle — pending, reviewed, shortlisted, rejected, or hired. Jobs can be saved with one click. The bookmark state updates instantly in the UI and syncs with the server in the background, reverting silently if the request fails.
+
+**For employers**
+
+Post jobs with salary ranges in INR, location type, skill requirements, and deadlines. The employer dashboard surfaces per-job analytics: how many candidates have seen the listing, how many have applied, and which post is generating the most interest. Application status can be updated at the individual level with optional employer notes.
+
+**For admins**
+
+A separate admin control panel provides platform-wide visibility: total user counts broken down by role, jobs posted per day over the last seven days, a top-companies leaderboard, application status funnel, and full user/job management with deletion.
+
+**Forgot password**
+
+Full token-based reset flow. A SHA-256 hashed token is stored in the database with a one-hour expiry. When SMTP credentials are configured (Gmail App Password), a branded HTML email is sent. Without SMTP, the reset link is returned directly in the API response for local development.
 
 ---
 
-## 📁 Project Structure
+## Architecture
 
 ```
-job-portalhosted/
-├── backend/
-│   ├── prisma/
-│   │   ├── schema.prisma          # Database schema (User, Job, Application)
-│   │   └── seed-admin.js          # Admin account seeder
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── prisma.js          # Prisma client singleton
-│   │   ├── middleware/
-│   │   │   ├── auth.js            # JWT protect middleware
-│   │   │   └── errorHandler.js    # Global error handler
-│   │   └── routes/
-│   │       ├── auth.js            # Register, Login, Me, Forgot/Reset Password
-│   │       ├── jobs.js            # CRUD + search/filter
-│   │       ├── applications.js    # Apply, status update
-│   │       ├── users.js           # Profile, save jobs
-│   │       └── admin.js           # Admin stats, user/job management
-│   ├── server.js                  # Express app + CORS + routes
-│   └── .env                       # Environment variables
-│
-└── frontend/
-    ├── src/
-    │   ├── components/
-    │   │   ├── Navbar.tsx
-    │   │   ├── Footer.tsx
-    │   │   ├── JobCard.tsx         # Optimistic save bookmark
-    │   │   ├── JobCardSkeleton.tsx # Shimmer skeleton loader
-    │   │   └── Spinner.tsx
-    │   ├── context/
-    │   │   └── AuthContext.tsx     # Global auth state
-    │   ├── hooks/
-    │   │   └── useDebounce.ts     # Debounce hook for search
-    │   ├── pages/
-    │   │   ├── Home.tsx
-    │   │   ├── Jobs.tsx            # Infinite scroll + debounce + skeleton
-    │   │   ├── JobDetail.tsx
-    │   │   ├── Login.tsx           # + Forgot password link
-    │   │   ├── Register.tsx
-    │   │   ├── ForgotPassword.tsx  # Email reset flow
-    │   │   ├── ResetPassword.tsx   # Token-based password reset
-    │   │   ├── Dashboard.tsx
-    │   │   ├── Profile.tsx
-    │   │   ├── PostJob.tsx
-    │   │   ├── Applications.tsx
-    │   │   ├── EmployerJobDetails.tsx
-    │   │   └── AdminDashboard.tsx
-    │   ├── services/
-    │   │   └── api.ts              # All API calls (axios)
-    │   ├── App.tsx                 # Routes + React.lazy code splitting
-    │   └── index.css              # Full design system
-    └── vite.config.ts
+Browser (React + Vite)
+     |
+     | HTTPS / JSON
+     v
+Express REST API (Node.js)
+     |
+     |-- JWT authentication middleware
+     |-- Role guard (seeker / employer / admin)
+     |
+     v
+Prisma ORM
+     |
+     v
+PostgreSQL (Supabase)
 ```
+
+The frontend and backend are fully decoupled. CORS is configured to accept comma-separated origins from the `CLIENT_URL` environment variable, with `localhost` always permitted for local development. This means you can add a staging frontend without touching the backend code.
 
 ---
 
-## 🚀 Getting Started
+## Tech Stack
+
+**Frontend**
+
+| Technology | Version | Purpose |
+|---|---|---|
+| React | 18 | Component model and rendering |
+| TypeScript | 5 | Type safety across the frontend |
+| Vite | 5 | Build tool, dev server, code splitting |
+| React Router | 6 | Client-side routing with lazy loading |
+| Framer Motion | 11 | Page transitions and micro-animations |
+| Axios | 1.6 | HTTP client with request interceptors |
+| Lucide React | — | Icon library |
+| React Hot Toast | — | Non-blocking notifications |
+| CSS Variables | — | Design token system and theming |
+
+**Backend**
+
+| Technology | Version | Purpose |
+|---|---|---|
+| Node.js | 20+ | Runtime |
+| Express | 5 | HTTP framework |
+| Prisma | 5.22 | Type-safe database access layer |
+| PostgreSQL | 15 | Relational database |
+| jsonwebtoken | — | Stateless auth tokens |
+| bcryptjs | — | Password hashing (10 rounds) |
+| express-validator | — | Request body validation |
+| Nodemailer | — | Transactional email (password reset) |
+| cors | — | Configurable cross-origin policy |
+
+---
+
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- npm or yarn
-- PostgreSQL database (or Supabase free tier)
 
-### 1. Clone the repository
+- Node.js 18 or later
+- A PostgreSQL database (Supabase free tier works, connection string required)
+
+### Clone and install
+
 ```bash
 git clone https://github.com/SURAJJJJJ11111/JobNexus-Full-Stack-Job-Portal.git
 cd JobNexus-Full-Stack-Job-Portal
 ```
 
-### 2. Set up the Backend
+### Backend setup
 
 ```bash
 cd backend
 npm install
 ```
 
-Create `.env` file:
+Create `backend/.env`:
+
 ```env
 PORT=5000
-DATABASE_URL="postgresql://user:password@host:5432/dbname"
-JWT_SECRET=your_super_secret_jwt_key
+DATABASE_URL="postgresql://user:password@host:5432/postgres"
+JWT_SECRET=replace_with_a_long_random_string
 NODE_ENV=development
 CLIENT_URL=http://localhost:5173
 
-# Optional — enables real password reset emails
-SMTP_USER=your.gmail@gmail.com
+# Optional — enables real password reset emails via Gmail
+SMTP_USER=your.address@gmail.com
 SMTP_PASS=your_gmail_app_password
 ```
 
-Push the schema to your database:
+Push the schema and seed an admin account:
+
 ```bash
 npx prisma db push
-```
-
-Seed an admin account:
-```bash
 node prisma/seed-admin.js
 ```
 
-Start the backend:
+Start the API server:
+
 ```bash
 npm run dev
 ```
 
-### 3. Set up the Frontend
+### Frontend setup
 
 ```bash
 cd frontend
 npm install
 ```
 
-Create `.env` file:
+Create `frontend/.env`:
+
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-Start the frontend:
+Start the dev server:
+
 ```bash
 npm run dev
 ```
 
-Open **http://localhost:5173**
+Open `http://localhost:5173`. Login with `admin@demo.com` / `admin123` (seeded above).
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 ### Authentication
-| Method | Endpoint | Description | Auth |
+
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| POST | `/api/auth/register` | Register new user | Public |
-| POST | `/api/auth/login` | Login & get JWT | Public |
-| GET | `/api/auth/me` | Get current user | 🔒 |
-| POST | `/api/auth/forgot-password` | Send password reset link | Public |
-| POST | `/api/auth/reset-password/:token` | Reset password with token | Public |
+| POST | `/api/auth/register` | Public | Create a new account (seeker or employer) |
+| POST | `/api/auth/login` | Public | Authenticate and receive a JWT |
+| GET | `/api/auth/me` | Protected | Return the authenticated user |
+| POST | `/api/auth/forgot-password` | Public | Generate a reset token and send email |
+| POST | `/api/auth/reset-password/:token` | Public | Validate token and update password |
 
 ### Jobs
-| Method | Endpoint | Description | Auth |
+
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| GET | `/api/jobs` | List/search jobs (pagination, filters) | Public |
-| GET | `/api/jobs/:id` | Get single job | Public |
-| POST | `/api/jobs` | Create job listing | 🔒 Employer |
-| PUT | `/api/jobs/:id` | Update job | 🔒 Employer |
-| DELETE | `/api/jobs/:id` | Delete job | 🔒 Employer |
-| GET | `/api/jobs/employer/my-jobs` | Employer's own jobs | 🔒 Employer |
+| GET | `/api/jobs` | Public | Search and filter jobs with pagination |
+| GET | `/api/jobs/:id` | Public | Single job detail (increments view count) |
+| POST | `/api/jobs` | Employer | Create a job listing |
+| PUT | `/api/jobs/:id` | Employer | Update your own listing |
+| DELETE | `/api/jobs/:id` | Employer | Delete your own listing |
+| GET | `/api/jobs/employer/my-jobs` | Employer | All listings posted by the caller |
 
 ### Applications
-| Method | Endpoint | Description | Auth |
+
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| POST | `/api/applications/:jobId` | Apply to a job | 🔒 Seeker |
-| GET | `/api/applications/my` | My applications | 🔒 Seeker |
-| GET | `/api/applications/job/:jobId` | Job's applications | 🔒 Employer |
-| PUT | `/api/applications/:id/status` | Update status | 🔒 Employer |
+| POST | `/api/applications/:jobId` | Seeker | Submit an application |
+| GET | `/api/applications/my` | Seeker | All applications by the caller |
+| GET | `/api/applications/job/:jobId` | Employer | All applications for a specific job |
+| PUT | `/api/applications/:id/status` | Employer | Update status and add employer note |
 
 ### Users
-| Method | Endpoint | Description | Auth |
+
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| PUT | `/api/users/profile` | Update profile | 🔒 |
-| POST | `/api/users/save-job/:jobId` | Toggle save/unsave job | 🔒 |
-| GET | `/api/users/saved-jobs` | Get saved jobs | 🔒 |
+| PUT | `/api/users/profile` | Protected | Update profile, skills, or company info |
+| POST | `/api/users/save-job/:jobId` | Protected | Toggle saved/unsaved state for a job |
+| GET | `/api/users/saved-jobs` | Protected | Return all saved jobs for the caller |
 
 ### Admin
-| Method | Endpoint | Description | Auth |
+
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| GET | `/api/admin/stats` | Platform statistics | 🔒 Admin |
-| GET | `/api/admin/users` | All users | 🔒 Admin |
-| GET | `/api/admin/jobs` | All jobs | 🔒 Admin |
-| DELETE | `/api/admin/users/:id` | Delete user | 🔒 Admin |
-| DELETE | `/api/admin/jobs/:id` | Delete job | 🔒 Admin |
+| GET | `/api/admin/stats` | Admin | Platform stats, 7-day job trend, top companies, funnel |
+| GET | `/api/admin/users` | Admin | All registered users |
+| DELETE | `/api/admin/users/:id` | Admin | Delete a user and cascade their data |
+| GET | `/api/admin/jobs` | Admin | All job listings |
+| DELETE | `/api/admin/jobs/:id` | Admin | Delete a listing and cascade applications |
 
 ---
 
-## 🔐 Authentication & Password Reset
+## Environment Variables
 
-### JWT Flow
-1. User registers/logs in → server returns a signed JWT
-2. JWT stored in `localStorage` as `jp_token`
-3. Axios interceptor automatically attaches `Authorization: Bearer <token>` to every request
-
-### Password Reset Flow
-1. User clicks **"Forgot password?"** on the login page
-2. Enters email → `POST /api/auth/forgot-password`
-3. Server generates a secure random token, stores SHA-256 hash in DB (expires in 1 hour)
-4. If `SMTP_USER`/`SMTP_PASS` env vars are set → sends a branded email
-5. User clicks the link → navigates to `/reset-password/:token`
-6. Enters new password with strength meter → `POST /api/auth/reset-password/:token`
-7. Server validates token hash + expiry → updates password → clears token
-
----
-
-## 🔑 Environment Variables
-
-### Backend (`backend/.env`)
+### Backend
 
 | Variable | Required | Description |
 |---|---|---|
-| `DATABASE_URL` | ✅ | PostgreSQL connection string |
-| `JWT_SECRET` | ✅ | Secret for signing JWT tokens |
-| `PORT` | Optional | Server port (default: 5000) |
-| `CLIENT_URL` | ✅ Hosted | Frontend URL(s) for CORS — comma-separated |
-| `NODE_ENV` | Optional | `development` or `production` |
-| `SMTP_USER` | Optional | Gmail address for password reset emails |
-| `SMTP_PASS` | Optional | Gmail App Password (not your real password) |
+| `DATABASE_URL` | Yes | Prisma connection string to your PostgreSQL instance |
+| `JWT_SECRET` | Yes | Random string used to sign tokens — keep it secret |
+| `CLIENT_URL` | Yes (hosted) | Frontend origin(s) for CORS. Comma-separated for multiple. |
+| `PORT` | No | Server port, defaults to 5000 |
+| `NODE_ENV` | No | Set to `production` on Render |
+| `SMTP_USER` | No | Gmail address for password reset emails |
+| `SMTP_PASS` | No | Gmail App Password — generate at myaccount.google.com/apppasswords |
 
-### Frontend (`frontend/.env`)
+### Frontend
 
 | Variable | Required | Description |
 |---|---|---|
-| `VITE_API_URL` | ✅ Hosted | Backend API base URL (e.g. `https://your-backend.onrender.com/api`) |
+| `VITE_API_URL` | Yes (hosted) | Full backend URL including `/api` — e.g. `https://your-api.onrender.com/api` |
 
 ---
 
-## 🚢 Deployment
+## Deployment
 
-### Frontend → Vercel
-1. Push code to GitHub
-2. Import project on [vercel.com](https://vercel.com)
-3. **Root directory:** `frontend`
-4. **Framework preset:** Vite
-5. **Environment Variables:** Add `VITE_API_URL=https://your-backend.onrender.com/api`
-6. Deploy → **Redeploy after adding env vars**
+### Frontend on Vercel
 
-### Backend → Render
-1. Create a **Web Service** on [render.com](https://render.com)
-2. **Root Directory:** `backend`
-3. **Build Command:** `npm install && npx prisma generate`
-4. **Start Command:** `npm start`
-5. **Environment Variables:**
-   - `DATABASE_URL` — Supabase/Neon PostgreSQL URL
-   - `JWT_SECRET` — strong random string
-   - `CLIENT_URL` — your Vercel frontend URL
-   - `NODE_ENV=production`
+1. Import the repo at vercel.com
+2. Set root directory to `frontend`
+3. Framework: Vite (auto-detected)
+4. Add environment variable: `VITE_API_URL=https://your-backend.onrender.com/api`
+5. Deploy. After adding env vars, trigger a fresh redeploy — Vite bakes them into the build at compile time, not at runtime.
 
-### Database → Supabase (Free)
-1. Create project at [supabase.com](https://supabase.com)
-2. Copy the **Connection string** from Settings → Database
-3. Run `npx prisma db push` locally with your production `DATABASE_URL`
+### Backend on Render
 
----
+1. Create a Web Service, point it at the repo
+2. Set root directory to `backend`
+3. Build command: `npm install && npx prisma generate`
+4. Start command: `npm start`
+5. Add environment variables from the table above
+6. Render auto-deploys on every push to `main`
 
-## 🤝 Contributing
+### Database on Supabase
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'feat: Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+1. Create a project at supabase.com
+2. Copy the connection string from Settings > Database > Connection String > URI
+3. Set it as `DATABASE_URL` in both local `.env` and Render
+4. Run `npx prisma db push` once to create the tables
 
 ---
 
-## 📄 License
+## Performance
 
-This project is licensed under the MIT License.
+Several deliberate decisions were made to keep the perceived performance high:
+
+**Code splitting** — Every page except Home, Login, and Register is loaded lazily via `React.lazy()` and `Suspense`. Vite splits these into separate chunks automatically, so a user browsing job listings never downloads the admin dashboard bundle.
+
+**Debounced search** — Search and location inputs wait 400ms after the last keystroke before firing an API request. This eliminates the burst of redundant requests that fires on every character in a naive implementation.
+
+**Infinite scroll** — An `IntersectionObserver` watches a sentinel element below the job grid. When it enters the viewport, the next page loads automatically. No pagination buttons.
+
+**Skeleton loaders** — While data is in flight, the layout shows shimmer placeholders that match the dimensions of the real content. There is no blank white flash between navigation and content appearing.
+
+**Optimistic UI** — The save/bookmark action on a job card updates the UI immediately. The API call runs in the background. If it fails, the state reverts and a toast explains why. The user never waits for a round trip.
 
 ---
 
-<div align="center">
-  Built with ❤️ using React, Node.js, Prisma & PostgreSQL
-</div>
+## Project Structure
+
+```
+job-portalhosted/
+├── backend/
+│   ├── prisma/
+│   │   ├── schema.prisma          # User, Job, Application models
+│   │   └── seed-admin.js          # Creates the default admin account
+│   ├── src/
+│   │   ├── config/
+│   │   │   └── prisma.js          # Singleton Prisma client
+│   │   ├── middleware/
+│   │   │   ├── auth.js            # JWT verification + role guards
+│   │   │   └── errorHandler.js    # Centralized error handling
+│   │   └── routes/
+│   │       ├── auth.js            # Register, login, forgot/reset password
+│   │       ├── jobs.js            # Listings with search, filter, pagination
+│   │       ├── applications.js    # Apply and manage applications
+│   │       ├── users.js           # Profile updates, saved jobs
+│   │       └── admin.js           # Stats aggregation, user/job management
+│   └── server.js                  # Express app entry point
+│
+└── frontend/
+    └── src/
+        ├── components/
+        │   ├── Navbar.tsx
+        │   ├── Footer.tsx          # All links point to real routes
+        │   ├── JobCard.tsx         # With optimistic save bookmark
+        │   ├── JobCardSkeleton.tsx # Shimmer placeholder
+        │   └── Spinner.tsx
+        ├── context/
+        │   └── AuthContext.tsx     # Auth state, token management
+        ├── hooks/
+        │   └── useDebounce.ts     # 400ms search debounce
+        ├── pages/
+        │   ├── Home.tsx
+        │   ├── Jobs.tsx            # Infinite scroll, debounce, skeleton
+        │   ├── JobDetail.tsx
+        │   ├── Login.tsx           # With forgot password link
+        │   ├── Register.tsx        # Role toggle: seeker / employer
+        │   ├── ForgotPassword.tsx
+        │   ├── ResetPassword.tsx   # Password strength meter
+        │   ├── Dashboard.tsx       # Employer analytics + seeker tracker
+        │   ├── Profile.tsx
+        │   ├── PostJob.tsx
+        │   ├── Applications.tsx
+        │   ├── EmployerJobDetails.tsx
+        │   └── AdminDashboard.tsx  # Charts, funnel, company leaderboard
+        ├── services/
+        │   └── api.ts              # All API calls via Axios
+        └── App.tsx                 # Routing with React.lazy code splitting
+```
+
+---
+
+## License
+
+MIT. Use it, fork it, ship it.
