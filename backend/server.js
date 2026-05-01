@@ -17,8 +17,23 @@ const adminRoutes = require('./src/routes/admin');
 const app = express();
 
 // Middleware
+// CLIENT_URL can be a single URL or comma-separated list of allowed origins
+// e.g. "https://job-nexus-full-stack-job-portal.vercel.app,https://job-portal-frontend.onrender.com"
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+    .split(',')
+    .map(o => o.trim())
+    .filter(Boolean)
+    .concat(['http://localhost:5173', 'http://localhost:3000']); // always allow local dev
+
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+        // Allow requests with no origin (mobile apps, curl, Postman)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error(`CORS: Origin ${origin} not allowed`));
+    },
     credentials: true,
 }));
 
