@@ -147,4 +147,123 @@ router.get('/me', protect, async (req, res, next) => {
     }
 });
 
+// @route   POST /api/auth/forgot-password
+// @desc    Generate a password reset token and (optionally) email it
+// @access  Public
+router.post('/forgot-password',
+    [body('email').isEmail().withMessage('Valid email is required')],
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ success: false, message: errors.array()[0].msg });
+            }
+
+            const { email } = req.body;
+            const user = await prisma.user.findUnique({ where: { email } });
+
+            // Always respond with success to prevent email enumeration attacks
+            if (!user) {
+                return res.json({ success: true, message: 'If that email exists, a reset link has been sent.' });
+            }
+
+            // Generate a secure random token
+            const crypto = require('crypto');
+            const rawToken = crypto.randomBytes(32).toString('hex');
+            const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+            const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+            await prisma.user.update({
+                where: { email },
+                data: { resetToken: hashedToken, resetTokenExpiry: expiry }
+            });
+
+            const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${rawToken}`;
+
+            // Try to send email if SMTP is configured
+            if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+                try {
+                    const nodemailer = require('nodemailer');
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+                    });
+                    await transporter.sendMail({
+                        from: `"JobNexus" <${process.env.SMTP_USER}>`,
+                        to: email,
+                        subject: 'Reset your JobNexus password',
+                        html: `
+                            <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;">
+                                <h2 style="color:#2563eb;">Reset Your Password</h2>
+                                <p>Hi ${user.name},</p>
+                                <p>You requested a password reset for your JobNexus account. Click the button below to set a new password. This link expires in <strong>1 hour</strong>.</p>
+                                <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:12px 28px;border-radius:50px;text-decoration:none;font-weight:600;margin:16px 0;">
+                                    Reset Password
+                                </a>
+                                <p style="color:#64748b;font-size:0.85em;">If you didn't request this, you can safely ignore this email.</p>
+                                <p style="color:#64748b;font-size:0.75em;">Or paste this link: ${resetUrl}</p>
+                            </div>
+                        `
+                    });
+                    return res.json({ success: true, message: 'Reset link sent to your email.' });
+                } catch (emailErr) {
+                    console.error('Email send failed:', emailErr.message);
+                }
+            }
+
+            // Development fallback: return the raw link in the response
+            return res.json({
+                success: true,
+                message: 'Reset link generated.',
+                // Only expose the link in non-production if no email service is set up
+                ...(process.env.NODE_ENV !== 'production' && { resetUrl })
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+// @route   POST /api/auth/reset-password/:token
+// @desc    Validate reset token and update password
+// @access  Public
+router.post('/reset-password/:token',
+    [body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')],
+    async (req, res, next) => {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ success: false, message: errors.array()[0].msg });
+            }
+
+            const crypto = require('crypto');
+            const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+            const user = await prisma.user.findFirst({
+                where: {
+                    resetToken: hashedToken,
+                    resetTokenExpiry: { gt: new Date() }
+                }
+            });
+
+            if (!user) {
+                return res.status(400).json({ success: false, message: 'Reset link is invalid or has expired.' });
+            }
+
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+            await prisma.user.update({
+                where: { id: user.id },
+                data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null }
+            });
+
+            res.json({ success: true, message: 'Password reset successfully. You can now log in.' });
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
 module.exports = router;
+

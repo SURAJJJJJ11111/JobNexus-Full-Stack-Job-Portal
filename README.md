@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 JobNexus — Full-Stack Job Portal
+#  JobNexus — Full-Stack Job Portal
 
 **A modern, production-quality job portal connecting job seekers with top employers**
 

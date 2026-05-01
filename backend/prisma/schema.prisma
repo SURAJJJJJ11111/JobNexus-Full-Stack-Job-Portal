@@ -23,7 +23,10 @@ model User {
   companyDescription  String?
   companyWebsite      String?
   savedJobs    String        @default("[]") // stored as JSON String of Job IDs
-  
+
+  resetToken       String?   // hashed reset token
+  resetTokenExpiry DateTime? // token expiry (1 hour)
+
   postedJobs   Job[]         @relation("EmployerJobs")
   applications Application[] @relation("UserApplications")
 
