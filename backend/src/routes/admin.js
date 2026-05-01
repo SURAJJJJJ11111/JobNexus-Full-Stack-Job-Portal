@@ -8,13 +8,81 @@ router.use(protect);
 router.use(requireRole('admin'));
 
 // @route   GET /api/admin/stats
-// @desc    Get counts for admin dashboard
+// @desc    Rich stats for admin dashboard (role breakdown, trends, top companies, funnel)
 router.get('/stats', async (req, res, next) => {
     try {
-        const usersCount = await prisma.user.count();
-        const jobsCount = await prisma.job.count();
-        const applicationsCount = await prisma.application.count();
-        res.json({ success: true, stats: { users: usersCount, jobs: jobsCount, applications: applicationsCount } });
+        // Basic counts
+        const [usersCount, jobsCount, applicationsCount] = await Promise.all([
+            prisma.user.count(),
+            prisma.job.count(),
+            prisma.application.count(),
+        ]);
+
+        // Role breakdown
+        const [seekersCount, employersCount] = await Promise.all([
+            prisma.user.count({ where: { role: 'seeker' } }),
+            prisma.user.count({ where: { role: 'employer' } }),
+        ]);
+
+        // Jobs posted per day — last 7 days
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+        sevenDaysAgo.setHours(0, 0, 0, 0);
+
+        const recentJobs = await prisma.job.findMany({
+            where: { createdAt: { gte: sevenDaysAgo } },
+            select: { createdAt: true },
+        });
+
+        const jobsPerDay = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const label = d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+            const count = recentJobs.filter(j => {
+                const jd = new Date(j.createdAt);
+                return jd.getDate() === d.getDate() && jd.getMonth() === d.getMonth();
+            }).length;
+            jobsPerDay.push({ label, count });
+        }
+
+        // Most active companies (by job count)
+        const allJobs = await prisma.job.findMany({ select: { company: true, applicationsCount: true } });
+        const companyMap: Record<string, { jobs: number; applications: number }> = {};
+        allJobs.forEach(j => {
+            if (!companyMap[j.company]) companyMap[j.company] = { jobs: 0, applications: 0 };
+            companyMap[j.company].jobs += 1;
+            companyMap[j.company].applications += (j.applicationsCount || 0);
+        });
+        const topCompanies = Object.entries(companyMap)
+            .map(([name, d]) => ({ name, ...d }))
+            .sort((a, b) => b.jobs - a.jobs)
+            .slice(0, 5);
+
+        // Application status funnel
+        const appStatuses = await prisma.application.groupBy({
+            by: ['status'],
+            _count: { status: true },
+        });
+        const funnel = appStatuses.map(s => ({ status: s.status, count: s._count.status }));
+
+        // New users this week
+        const newUsersThisWeek = await prisma.user.count({ where: { createdAt: { gte: sevenDaysAgo } } });
+
+        res.json({
+            success: true,
+            stats: {
+                users: usersCount,
+                jobs: jobsCount,
+                applications: applicationsCount,
+                seekers: seekersCount,
+                employers: employersCount,
+                newUsersThisWeek,
+                jobsPerDay,
+                topCompanies,
+                funnel,
+            }
+        });
     } catch (error) {
         next(error);
     }

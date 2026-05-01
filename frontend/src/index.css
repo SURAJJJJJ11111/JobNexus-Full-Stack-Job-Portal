@@ -500,6 +500,11 @@ input, textarea, select { font-family: inherit; }
 
 /* ---------- Dashboard ---------- */
 .dashboard { padding-top: 80px; min-height: 100vh; }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
 .dashboard__grid { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; padding: 2rem 0; }
 .stat-card {
   background: var(--bg-card);
