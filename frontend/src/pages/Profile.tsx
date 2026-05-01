@@ -1,11 +1,26 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     User, Mail, MapPin, FileText, Tag, Save, X, Plus,
     Building2, Globe, ExternalLink, Briefcase, Shield
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { updateProfile } from '../services/api';
+import toast from 'react-hot-toast';
+
+const CITY_SUGGESTIONS = [
+    'Mumbai, Maharashtra', 'Delhi, NCR', 'Bengaluru, Karnataka', 'Hyderabad, Telangana',
+    'Chennai, Tamil Nadu', 'Kolkata, West Bengal', 'Pune, Maharashtra', 'Ahmedabad, Gujarat',
+    'Jaipur, Rajasthan', 'Lucknow, Uttar Pradesh', 'Chandigarh, Punjab', 'Kochi, Kerala',
+    'Indore, Madhya Pradesh', 'Bhopal, Madhya Pradesh', 'Nagpur, Maharashtra', 'Surat, Gujarat',
+    'Vadodara, Gujarat', 'Patna, Bihar', 'Bhubaneswar, Odisha', 'Visakhapatnam, Andhra Pradesh',
+    'Coimbatore, Tamil Nadu', 'Mysuru, Karnataka', 'Thiruvananthapuram, Kerala', 'Noida, Uttar Pradesh',
+    'Gurgaon, Haryana', 'Faridabad, Haryana', 'Ghaziabad, Uttar Pradesh', 'Agra, Uttar Pradesh',
+    'Meerut, Uttar Pradesh', 'Ranchi, Jharkhand', 'Raipur, Chhattisgarh', 'Dehradun, Uttarakhand',
+    'Shimla, Himachal Pradesh', 'Jammu, J&K', 'Srinagar, J&K', 'Guwahati, Assam',
+    'Imphal, Manipur', 'Shillong, Meghalaya', 'Aizawl, Mizoram', 'Panaji, Goa',
+    'Remote, India', 'Bangalore (Remote)', 'Mumbai (Hybrid)', 'Delhi (Hybrid)',
+];
 import toast from 'react-hot-toast';
 
 const ROLE_META: Record<string, { label: string; badge: string; icon: JSX.Element }> = {
@@ -18,6 +33,50 @@ export default function Profile() {
     const { user, updateUser } = useAuth();
     const [loading, setLoading] = useState(false);
     const [skillInput, setSkillInput] = useState('');
+    const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [activeSuggestion, setActiveSuggestion] = useState(-1);
+    const locationRef = useRef<HTMLDivElement>(null);
+
+    // Close suggestion dropdown on outside click
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (locationRef.current && !locationRef.current.contains(e.target as Node)) {
+                setShowSuggestions(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, []);
+
+    const handleLocationChange = (val: string) => {
+        set('location', val);
+        setActiveSuggestion(-1);
+        if (val.trim().length >= 1) {
+            const filtered = CITY_SUGGESTIONS.filter(c =>
+                c.toLowerCase().includes(val.toLowerCase())
+            ).slice(0, 6);
+            setLocationSuggestions(filtered);
+            setShowSuggestions(filtered.length > 0);
+        } else {
+            setShowSuggestions(false);
+        }
+    };
+
+    const handleLocationKey = (e: React.KeyboardEvent) => {
+        if (!showSuggestions) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); setActiveSuggestion(i => Math.min(i + 1, locationSuggestions.length - 1)); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); setActiveSuggestion(i => Math.max(i - 1, 0)); }
+        else if (e.key === 'Enter' && activeSuggestion >= 0) { e.preventDefault(); selectLocation(locationSuggestions[activeSuggestion]); }
+        else if (e.key === 'Escape') setShowSuggestions(false);
+    };
+
+    const selectLocation = (city: string) => {
+        set('location', city);
+        setShowSuggestions(false);
+        setActiveSuggestion(-1);
+    };
+
     const [form, setForm] = useState({
         name:     user?.name || '',
         bio:      user?.bio  || '',
@@ -118,12 +177,63 @@ export default function Profile() {
                                         <input className="form-input" style={{ paddingLeft: '2.5rem' }} value={form.name} onChange={e => set('name', e.target.value)} placeholder="Your full name" />
                                     </div>
                                 </div>
-                                {/* Location */}
-                                <div className="form-group">
+                                {/* Location with autocomplete */}
+                                <div className="form-group" ref={locationRef}>
                                     <label className="form-label">Location</label>
                                     <div style={{ position: 'relative' }}>
-                                        <MapPin size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-                                        <input className="form-input" style={{ paddingLeft: '2.5rem' }} placeholder="City, Country" value={form.location} onChange={e => set('location', e.target.value)} />
+                                        <MapPin size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', zIndex: 1 }} />
+                                        <input
+                                            className="form-input"
+                                            style={{ paddingLeft: '2.5rem' }}
+                                            placeholder="Type a city name…"
+                                            value={form.location}
+                                            onChange={e => handleLocationChange(e.target.value)}
+                                            onKeyDown={handleLocationKey}
+                                            onFocus={() => form.location && handleLocationChange(form.location)}
+                                            autoComplete="off"
+                                        />
+                                        <AnimatePresence>
+                                            {showSuggestions && (
+                                                <motion.ul
+                                                    initial={{ opacity: 0, y: -6 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -6 }}
+                                                    transition={{ duration: 0.15 }}
+                                                    style={{
+                                                        position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                                                        background: 'var(--bg-surface)',
+                                                        border: '1px solid var(--border-subtle)',
+                                                        borderRadius: 'var(--radius-md)',
+                                                        boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
+                                                        marginTop: 4,
+                                                        listStyle: 'none',
+                                                        padding: '0.375rem',
+                                                        maxHeight: 220,
+                                                        overflowY: 'auto',
+                                                    }}
+                                                >
+                                                    {locationSuggestions.map((city, i) => (
+                                                        <li
+                                                            key={city}
+                                                            onMouseDown={() => selectLocation(city)}
+                                                            style={{
+                                                                padding: '0.5rem 0.75rem',
+                                                                borderRadius: 'var(--radius-sm)',
+                                                                cursor: 'pointer',
+                                                                fontSize: '0.875rem',
+                                                                display: 'flex', alignItems: 'center', gap: 8,
+                                                                background: i === activeSuggestion ? 'var(--bg-hover)' : 'transparent',
+                                                                color: 'var(--text-primary)',
+                                                                transition: 'background 0.1s',
+                                                            }}
+                                                        >
+                                                            <MapPin size={12} color="var(--brand-400)" />
+                                                            {city}
+                                                        </li>
+                                                    ))}
+                                                </motion.ul>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                 </div>
                                 {/* Resume URL — seeker only */}
